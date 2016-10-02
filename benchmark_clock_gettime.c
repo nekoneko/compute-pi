@@ -16,6 +16,7 @@ int main(int argc, char const *argv[])
     int N = atoi(argv[1]);
     int i, loop = 25;
 
+
     // Baseline
     clock_gettime(CLOCK_ID, &start);
     for(i = 0; i < loop; i++) {
@@ -46,6 +47,7 @@ int main(int argc, char const *argv[])
            (end.tv_nsec - start.tv_nsec)/ONE_SEC);
 
 
+#if !defined(NON_AVX)
     // AVX SIMD
     clock_gettime(CLOCK_ID, &start);
     for(i = 0; i < loop; i++) {
@@ -62,8 +64,11 @@ int main(int argc, char const *argv[])
         compute_pi_avx_unroll(N);
     }
     clock_gettime(CLOCK_ID, &end);
-    printf("%lf\n", (double) (end.tv_sec - start.tv_sec) +
+    printf("%lf", (double) (end.tv_sec - start.tv_sec) +
            (end.tv_nsec - start.tv_nsec)/ONE_SEC);
+#endif
+
+    printf("\n");
 
     return 0;
 }
