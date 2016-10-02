@@ -1,11 +1,11 @@
 CC = gcc
 CFLAGS = -O0 -std=gnu99 -Wall -fopenmp -mavx
-CFLAGS2 = -O0 -std=gnu99 -Wall -fopenmp
+CFLAGS2 = -O0 -std=gnu99 -Wall -fopenmp -g
 EXECUTABLE = \
 	time_test_baseline time_test_openmp_2 time_test_openmp_4 \
 	time_test_avx time_test_avxunroll \
 	benchmark_clock_gettime benchmark_clock \
-	error_rate
+	error_rate distribute
 
 OUT_DIR = result
 
@@ -41,7 +41,12 @@ errorrate:
 	$(CC) -c $(CFLAGS2) computepi.c -o computepi.o
 	$(CC) $(CFLAGS2) computepi.o error_rate.c -o error_rate
 
-.PHONY: clean default nonavx errorrate
+distr:
+	$(CC) -c $(CFLAGS2) computepi.c -o computepi.o
+	$(CC) $(CFLAGS2) computepi.o distribute.c -o distribute
+	
+
+.PHONY: clean default nonavx errorrate distr
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -62,11 +67,14 @@ gencsv:
 		done > ./$(OUT_DIR)/$$j.csv; \
 	done
 
-generrorcsv:
+generrorcsv: errorrate
 	for i in `seq 1000000 100000 100000000`; do \
 		printf "%d," $$i; \
 		./error_rate $$i; \
 	done > ./$(OUT_DIR)/error_rate.csv
+
+gendistricsv: distr
+	./distribute 100000 1000 5 > ./$(OUT_DIR)/distribute.csv
 
 plot: gencsv
 	for j in 10000 1000 100; do \
@@ -76,6 +84,9 @@ plot: gencsv
 
 ploterror: generrorcsv
 	gnuplot ./scripts/error_rate.gp
+
+plotdistri: gendistricsv
+	gnuplot ./scripts/distribute.gp
 
 clean:
 	rm -f $(EXECUTABLE) *.o *.s result_clock_gettime.csv result/*
