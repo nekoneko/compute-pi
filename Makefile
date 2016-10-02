@@ -87,6 +87,7 @@ ploterror: generrorcsv
 
 plotdistri: gendistricsv
 	gnuplot ./scripts/distribute.gp
+	gnuplot ./scripts/distribute2.gp
 
 clean:
 	rm -f $(EXECUTABLE) *.o *.s result_clock_gettime.csv result/*
