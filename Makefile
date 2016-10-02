@@ -5,7 +5,8 @@ EXECUTABLE = \
 	time_test_baseline time_test_openmp_2 time_test_openmp_4 \
 	time_test_avx time_test_avxunroll \
 	benchmark_clock_gettime benchmark_clock \
-	error_rate distribute
+	error_rate distribute \
+	benchmark_clock_gettime_ci
 
 OUT_DIR = result
 
@@ -45,8 +46,12 @@ distr:
 	$(CC) -c $(CFLAGS2) computepi.c -o computepi.o
 	$(CC) $(CFLAGS2) computepi.o distribute.c -o distribute
 	
+ci:
+	$(CC) -c $(CFLAGS2) computepi.c -o computepi.o
+	$(CC) $(CFLAGS2) computepi.o benchmark_clock_gettime_ci.c -o benchmark_clock_gettime_ci -lm
 
-.PHONY: clean default nonavx errorrate distr
+
+.PHONY: clean default nonavx errorrate distr ci
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
